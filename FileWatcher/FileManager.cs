@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using ConfigurationProvider;
+using DataManager;
+using FileWatcher.FileOperations;
+using Models;
 
 namespace FileWatcher
 {
@@ -26,6 +25,8 @@ namespace FileWatcher
         {
             if (configOptions != null)
             {
+                var fileGeneration = new FileGeneration(configOptions);
+                fileGeneration.GenerateXmlFile();
                 FileTransfer();
             }
 
@@ -63,7 +64,7 @@ namespace FileWatcher
                 var compressedPath = Path.ChangeExtension(newPath, "gz");
                 var newCompressedPath = Path.Combine(configOptions.StorageOptions.TargetDirectory,
                     Path.GetFileName(compressedPath));
-                var decompressedPath = Path.ChangeExtension(newCompressedPath, "txt");
+                var decompressedPath = Path.ChangeExtension(newCompressedPath, "xml");
 
                 if (!dirInfo.Exists)
                 {
@@ -72,14 +73,14 @@ namespace FileWatcher
 
                 dirInfo.CreateSubdirectory(subPath);
                 File.Move(configOptions.StorageOptions.SourseFileName, newPath);
-                FileOperations.EncryptFile(newPath, newPath, 
+                Encryption.EncryptFile(newPath, newPath,
                     configOptions.CryptingOptions.EncryptionKey);
-                FileOperations.Compress(newPath, compressedPath);
+                Compression.Compress(newPath, compressedPath);
                 File.Move(compressedPath, newCompressedPath);
-                FileOperations.Decompress(newCompressedPath, decompressedPath);
-                FileOperations.DecryptFile(decompressedPath, decompressedPath, 
+                Compression.Decompress(newCompressedPath, decompressedPath);
+                Encryption.DecryptFile(decompressedPath, decompressedPath,
                     configOptions.CryptingOptions.EncryptionKey);
-                FileOperations.AddToArchive(decompressedPath, 
+                Archiving.AddToArchive(decompressedPath,
                     configOptions.ArchiveOptions.ZipName);
                 File.Delete(newPath);
                 File.Delete(newCompressedPath);

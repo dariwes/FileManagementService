@@ -4,18 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileWatcher
+namespace Models
 {
     public class EtlOptions
     {
-        public StorageOptions StorageOptions { get; set; }
-        public ArchiveOptions ArchiveOptions { get; set; }
+        public DataBaseOptions DataBaseOptions { get; set; }
+        public StorageOptions StorageOptions   { get; set; }
+        public ArchiveOptions ArchiveOptions   { get; set; }
         public CryptingOptions CryptingOptions { get; set; }
+    }
+
+    public class DataBaseOptions
+    {
+        public string ConnectionString { get; set; }
     }
 
     public class StorageOptions
     {
-        public string SourseFileName { get; set; }
+        public string SourseFileName  { get; set; }
         public string TargetDirectory { get; set; }
     }
 
